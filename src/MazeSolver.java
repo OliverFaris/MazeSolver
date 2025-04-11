@@ -3,8 +3,12 @@
  * @author Ms. Namasivayam
  * @version 03/10/2023
  */
+// Maze Solver by Oliver Faris
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 public class MazeSolver {
     private Maze maze;
@@ -27,9 +31,24 @@ public class MazeSolver {
      * @return An arraylist of MazeCells to visit in order
      */
     public ArrayList<MazeCell> getSolution() {
-        // TODO: Get the solution from the maze
-        // Should be from start to end cells
-        return null;
+        // Initialize variables
+        ArrayList<MazeCell> solution = new ArrayList<>();
+        Stack<MazeCell> path = new Stack<>();
+        MazeCell currentCell = maze.getEndCell();
+
+        // Add path of cells to a stack
+        path.add(currentCell);
+        while (currentCell.getRow() != maze.getStartCell().getRow() && currentCell.getCol() != maze.getStartCell().getCol()) {
+            currentCell = currentCell.getParent();
+            path.add(currentCell);
+        }
+        path.add(maze.getStartCell());
+
+        // Reverse the order of the path by emptying stack into an ArrayList
+        while (!path.isEmpty()) {
+            solution.add(path.pop());
+        }
+        return solution;
     }
 
     /**
@@ -37,9 +56,51 @@ public class MazeSolver {
      * @return An ArrayList of MazeCells in order from the start to end cell
      */
     public ArrayList<MazeCell> solveMazeDFS() {
-        // TODO: Use DFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Initialize variables
+        int row = maze.getStartCell().getRow();
+        int col = maze.getStartCell().getCol();
+        Stack<MazeCell> cellsToExplore = new Stack<>();
+        MazeCell currentCell = maze.getStartCell();
+
+        // While not at the end cell
+        while (currentCell.getRow() != maze.getEndCell().getRow() || currentCell.getCol() != maze.getEndCell().getCol()) {
+            // If valid cell, add to stack and check other directions
+            // Check north
+            if (maze.isValidCell(row -1, col)) {
+                cellsToExplore.add(maze.getCell(row -1, col));
+                // Make this cell explored
+                maze.getCell(row -1, col).setExplored(true);
+            }
+
+            // Check east
+            if (maze.isValidCell(row, col +1)) {
+                cellsToExplore.add(maze.getCell(row, col +1));
+                maze.getCell(row, col +1).setExplored(true);
+            }
+
+            // Check south
+            if (maze.isValidCell(row +1, col)) {
+                cellsToExplore.add(maze.getCell(row +1, col));
+                maze.getCell(row +1, col).setExplored(true);
+            }
+
+            // Check west
+            if (maze.isValidCell(row, col -1)) {
+                cellsToExplore.add(maze.getCell(row, col -1));
+                maze.getCell(row, col -1).setExplored(true);
+            }
+
+            // Go to the new position in the grid from the top of the stack
+            MazeCell newCell = cellsToExplore.pop();
+            newCell.setParent(currentCell);
+            currentCell = newCell;
+            // Set new coordinates
+            row = currentCell.getRow();
+            col = currentCell.getCol();
+
+        }
+        return getSolution();
     }
 
     /**
@@ -49,7 +110,50 @@ public class MazeSolver {
     public ArrayList<MazeCell> solveMazeBFS() {
         // TODO: Use BFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Initialize variables
+        int row = maze.getStartCell().getRow();
+        int col = maze.getStartCell().getCol();
+        Queue<MazeCell> cellsToExplore = new LinkedList<>();
+        MazeCell currentCell = maze.getStartCell();
+
+        // While not at the end cell
+        while (currentCell.getRow() != maze.getEndCell().getRow() || currentCell.getCol() != maze.getEndCell().getCol()) {
+            // If valid cell, add to stack and check other directions
+            // Check north
+            if (maze.isValidCell(row -1, col)) {
+                cellsToExplore.add(maze.getCell(row -1, col));
+                // Make this cell explored
+                maze.getCell(row -1, col).setExplored(true);
+            }
+
+            // Check east
+            if (maze.isValidCell(row, col +1)) {
+                cellsToExplore.add(maze.getCell(row, col +1));
+                maze.getCell(row, col +1).setExplored(true);
+            }
+
+            // Check south
+            if (maze.isValidCell(row +1, col)) {
+                cellsToExplore.add(maze.getCell(row +1, col));
+                maze.getCell(row +1, col).setExplored(true);
+            }
+
+            // Check west
+            if (maze.isValidCell(row, col -1)) {
+                cellsToExplore.add(maze.getCell(row, col -1));
+                maze.getCell(row, col -1).setExplored(true);
+            }
+
+            // Go to the new position in the grid from the top of the stack
+            MazeCell newCell = cellsToExplore.remove();
+            newCell.setParent(currentCell);
+            currentCell = newCell;
+            // Set new coordinates
+            row = currentCell.getRow();
+            col = currentCell.getCol();
+
+        }
+        return getSolution();
     }
 
     public static void main(String[] args) {
