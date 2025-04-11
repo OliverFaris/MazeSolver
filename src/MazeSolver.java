@@ -108,7 +108,6 @@ public class MazeSolver {
      * @return An ArrayList of MazeCells in order from the start to end cell
      */
     public ArrayList<MazeCell> solveMazeBFS() {
-        // TODO: Use BFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
         // Initialize variables
         int row = maze.getStartCell().getRow();
@@ -116,12 +115,22 @@ public class MazeSolver {
         Queue<MazeCell> cellsToExplore = new LinkedList<>();
         MazeCell currentCell = maze.getStartCell();
 
+        currentCell.setExplored(true);
+        cellsToExplore.add(currentCell);
+
         // While not at the end cell
-        while (currentCell.getRow() != maze.getEndCell().getRow() || currentCell.getCol() != maze.getEndCell().getCol()) {
-            // If valid cell, add to stack and check other directions
+        while (!cellsToExplore.isEmpty()) {
+            // Go to the new position in the grid
+            currentCell = cellsToExplore.remove();
+            // Set new coordinates
+            row = currentCell.getRow();
+            col = currentCell.getCol();
+
+            // If valid cell, add to queue and check other directions
             // Check north
             if (maze.isValidCell(row -1, col)) {
                 cellsToExplore.add(maze.getCell(row -1, col));
+                maze.getCell(row -1, col).setParent(currentCell);
                 // Make this cell explored
                 maze.getCell(row -1, col).setExplored(true);
             }
@@ -129,28 +138,23 @@ public class MazeSolver {
             // Check east
             if (maze.isValidCell(row, col +1)) {
                 cellsToExplore.add(maze.getCell(row, col +1));
+                maze.getCell(row, col +1).setParent(currentCell);
                 maze.getCell(row, col +1).setExplored(true);
             }
 
             // Check south
             if (maze.isValidCell(row +1, col)) {
                 cellsToExplore.add(maze.getCell(row +1, col));
+                maze.getCell(row +1, col).setParent(currentCell);
                 maze.getCell(row +1, col).setExplored(true);
             }
 
             // Check west
             if (maze.isValidCell(row, col -1)) {
                 cellsToExplore.add(maze.getCell(row, col -1));
+                maze.getCell(row, col -1).setParent(currentCell);
                 maze.getCell(row, col -1).setExplored(true);
             }
-
-            // Go to the new position in the grid from the top of the stack
-            MazeCell newCell = cellsToExplore.remove();
-            newCell.setParent(currentCell);
-            currentCell = newCell;
-            // Set new coordinates
-            row = currentCell.getRow();
-            col = currentCell.getCol();
 
         }
         return getSolution();
